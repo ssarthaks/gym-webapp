@@ -1,0 +1,11 @@
+node_modules
+
+.env
+
+src/config/*
+src/controllers/*
+src/middlewares/*
+src/routes/*
+src/utils/*
+
+app.ts
