@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../config/database';
+import { DataTypes, Model } from "sequelize";
+import { sequelize } from "../config/database";
 
 export class Session extends Model {
   public id!: number;
@@ -30,7 +30,7 @@ Session.init(
     },
   },
   {
-    tableName: 'sessions',
+    tableName: "sessions",
     sequelize,
   }
 );
