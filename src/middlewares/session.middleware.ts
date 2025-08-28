@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Session } from "../models/session.model";
 import { User } from "../models/user.model";
 
+// verify the user session middleware
 export const sessionMiddleware = async (
   req: Request,
   res: Response,

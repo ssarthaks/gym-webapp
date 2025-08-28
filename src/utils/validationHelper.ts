@@ -43,6 +43,13 @@ export const validateEmail = (email: string): ValidationError | null => {
   return null;
 };
 
+export const validateAddress = (address: string): ValidationError | null => {
+  if (!address || isEmpty(address.trim())) {
+    return { field: "address", message: "Address is required" };
+  }
+  return null;
+};
+
 export const validatePhone = (phone: string): ValidationError | null => {
   if (!phone || isEmpty(phone.trim())) {
     return { field: "phone", message: "Phone is required" };
@@ -89,33 +96,53 @@ export const sanitizePhone = (phone: string): string => {
   return phone.trim();
 };
 
+export const sanitizeAddress = (address: string): string => {
+  return escape(address.trim());
+};
+
 // Composite validation functions for different scenarios
 export const validateRegistrationData = (data: {
   name?: string;
   email?: string;
   phone?: string;
   password?: string;
+  address?: string;
 }): ValidationResult => {
   const errors: ValidationError[] = [];
-  const { name, email, phone, password } = data;
+  const { name, email, phone, password, address } = data;
 
-  // Validate required fields
-  if (name !== undefined) {
+  // Check for required fields first
+  if (name === undefined || name === null) {
+    errors.push({ field: "name", message: "Name is required" });
+  } else {
     const nameError = validateName(name);
     if (nameError) errors.push(nameError);
   }
 
-  if (email !== undefined) {
+  if (email === undefined || email === null) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else {
     const emailError = validateEmail(email);
     if (emailError) errors.push(emailError);
   }
 
-  if (phone !== undefined) {
+  if (phone === undefined || phone === null) {
+    errors.push({ field: "phone", message: "Phone is required" });
+  } else {
     const phoneError = validatePhone(phone);
     if (phoneError) errors.push(phoneError);
   }
 
-  if (password !== undefined) {
+  if (address === undefined || address === null) {
+    errors.push({ field: "address", message: "Address is required" });
+  } else {
+    const addressError = validateAddress(address);
+    if (addressError) errors.push(addressError);
+  }
+
+  if (password === undefined || password === null) {
+    errors.push({ field: "password", message: "Password is required" });
+  } else {
     const passwordError = validatePassword(password);
     if (passwordError) errors.push(passwordError);
   }
@@ -139,7 +166,8 @@ export const validateRegistrationData = (data: {
     sanitizedData.email = sanitizedEmail;
   }
   if (phone) sanitizedData.phone = sanitizePhone(phone);
-  if (password) sanitizedData.password = password; // Don't sanitize passwords
+  if (address) sanitizedData.address = sanitizeAddress(address);
+  if (password) sanitizedData.password = password;
 
   return { isValid: true, errors: [], sanitizedData };
 };
@@ -151,15 +179,18 @@ export const validateLoginData = (data: {
   const errors: ValidationError[] = [];
   const { email, password } = data;
 
-  if (email !== undefined) {
+  // Check for required fields first
+  if (email === undefined || email === null) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else {
     const emailError = validateEmail(email);
     if (emailError) errors.push(emailError);
   }
 
-  if (password !== undefined) {
-    if (!password || isEmpty(password)) {
-      errors.push({ field: "password", message: "Password is required" });
-    }
+  if (password === undefined || password === null) {
+    errors.push({ field: "password", message: "Password is required" });
+  } else if (!password || isEmpty(password)) {
+    errors.push({ field: "password", message: "Password is required" });
   }
 
   if (errors.length > 0) {
@@ -191,21 +222,26 @@ export const validatePasswordChange = (data: {
   const errors: ValidationError[] = [];
   const { email, oldPassword, newPassword } = data;
 
-  if (email !== undefined) {
+  // Check for required fields first
+  if (email === undefined || email === null) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else {
     const emailError = validateEmail(email);
     if (emailError) errors.push(emailError);
   }
 
-  if (oldPassword !== undefined) {
-    if (!oldPassword || isEmpty(oldPassword)) {
-      errors.push({
-        field: "oldPassword",
-        message: "Old password is required",
-      });
-    }
+  if (oldPassword === undefined || oldPassword === null) {
+    errors.push({ field: "oldPassword", message: "Old password is required" });
+  } else if (!oldPassword || isEmpty(oldPassword)) {
+    errors.push({
+      field: "oldPassword",
+      message: "Old password is required",
+    });
   }
 
-  if (newPassword !== undefined) {
+  if (newPassword === undefined || newPassword === null) {
+    errors.push({ field: "newPassword", message: "New password is required" });
+  } else {
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       errors.push({ field: "newPassword", message: passwordError.message });
@@ -246,16 +282,29 @@ export const validateProfileUpdate = (data: {
   email?: string;
   name?: string;
   phone?: string;
+  address?: string;
   newEmail?: string;
 }): ValidationResult => {
   const errors: ValidationError[] = [];
-  const { email, name, phone, newEmail } = data;
+  const { email, name, phone, address, newEmail } = data;
 
-  if (email !== undefined) {
+  // Email is required for profile updates (to identify the user)
+  if (email === undefined || email === null) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else {
     const emailError = validateEmail(email);
     if (emailError) errors.push(emailError);
   }
 
+  // Address is required for profile updates
+  if (address === undefined || address === null) {
+    errors.push({ field: "address", message: "Address is required" });
+  } else {
+    const addressError = validateAddress(address);
+    if (addressError) errors.push(addressError);
+  }
+
+  // Other fields are optional but must be valid if provided
   if (name !== undefined && name !== null && name !== "") {
     const nameError = validateName(name);
     if (nameError) errors.push(nameError);
@@ -295,6 +344,9 @@ export const validateProfileUpdate = (data: {
   if (phone !== undefined && phone !== null && phone !== "") {
     sanitizedData.phone = sanitizePhone(phone);
   }
+  if (address !== undefined && address !== null && address !== "") {
+    sanitizedData.address = sanitizeAddress(address);
+  }
   if (newEmail !== undefined && newEmail !== null && newEmail !== "") {
     const sanitizedNewEmail = sanitizeEmail(newEmail);
     if (!sanitizedNewEmail) {
@@ -315,7 +367,10 @@ export const validateEmailOnly = (data: {
   const errors: ValidationError[] = [];
   const { email } = data;
 
-  if (email !== undefined) {
+  // Email is required
+  if (email === undefined || email === null) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else {
     const emailError = validateEmail(email);
     if (emailError) errors.push(emailError);
   }
@@ -335,6 +390,113 @@ export const validateEmailOnly = (data: {
       };
     }
     sanitizedData.email = sanitizedEmail;
+  }
+
+  return { isValid: true, errors: [], sanitizedData };
+};
+
+// Validation for token-authenticated password change (no email required)
+export const validatePasswordChangeAuth = (data: {
+  oldPassword?: string;
+  newPassword?: string;
+}): ValidationResult => {
+  const errors: ValidationError[] = [];
+  const { oldPassword, newPassword } = data;
+
+  if (oldPassword === undefined || oldPassword === null) {
+    errors.push({ field: "oldPassword", message: "Old password is required" });
+  } else if (!oldPassword || isEmpty(oldPassword)) {
+    errors.push({
+      field: "oldPassword",
+      message: "Old password is required",
+    });
+  }
+
+  if (newPassword === undefined || newPassword === null) {
+    errors.push({ field: "newPassword", message: "New password is required" });
+  } else {
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      errors.push({ field: "newPassword", message: passwordError.message });
+    }
+  }
+
+  // Check if passwords are the same
+  if (oldPassword && newPassword && oldPassword === newPassword) {
+    errors.push({
+      field: "newPassword",
+      message: "New password must be different from the old password",
+    });
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  // Sanitize data
+  const sanitizedData: any = {};
+  if (oldPassword) sanitizedData.oldPassword = oldPassword;
+  if (newPassword) sanitizedData.newPassword = newPassword;
+
+  return { isValid: true, errors: [], sanitizedData };
+};
+
+// Validation for token-authenticated profile update (no email required)
+export const validateProfileUpdateAuth = (data: {
+  name?: string;
+  phone?: string;
+  address?: string;
+  newEmail?: string;
+}): ValidationResult => {
+  const errors: ValidationError[] = [];
+  const { name, phone, address, newEmail } = data;
+
+  // All fields are optional but must be valid if provided
+  if (name !== undefined && name !== null && name !== "") {
+    const nameError = validateName(name);
+    if (nameError) errors.push(nameError);
+  }
+
+  if (phone !== undefined && phone !== null && phone !== "") {
+    const phoneError = validatePhone(phone);
+    if (phoneError) errors.push(phoneError);
+  }
+
+  if (address !== undefined && address !== null && address !== "") {
+    const addressError = validateAddress(address);
+    if (addressError) errors.push(addressError);
+  }
+
+  if (newEmail !== undefined && newEmail !== null && newEmail !== "") {
+    const emailError = validateEmail(newEmail);
+    if (emailError) {
+      errors.push({ field: "newEmail", message: emailError.message });
+    }
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  // Sanitize data
+  const sanitizedData: any = {};
+  if (name !== undefined) sanitizedData.name = name ? escape(name.trim()) : "";
+  if (phone !== undefined) sanitizedData.phone = phone ? phone.trim() : "";
+  if (address !== undefined)
+    sanitizedData.address = address ? escape(address.trim()) : "";
+  if (newEmail !== undefined) {
+    if (newEmail) {
+      const sanitizedEmail = sanitizeEmail(newEmail);
+      if (!sanitizedEmail) {
+        return {
+          isValid: false,
+          errors: [{ field: "newEmail", message: "Invalid email format" }],
+        };
+      }
+      sanitizedData.newEmail = sanitizedEmail;
+    } else {
+      sanitizedData.newEmail = "";
+    }
   }
 
   return { isValid: true, errors: [], sanitizedData };

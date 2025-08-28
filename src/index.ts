@@ -1,5 +1,8 @@
 import app from "./app";
 import { sequelize } from "./config/database";
+import "./models/user.model";
+import "./models/session.model";
+import "./models/verificationCode.model";
 
 const port = process.env.PORT || 3000;
 

@@ -6,8 +6,8 @@ export class User extends Model {
   public name!: string;
   public email!: string;
   public phone!: string;
+  public address?: string;
   public password!: string;
-  public previousPasswords!: string[];
   public emailVerified!: boolean;
   public isDeleted!: boolean;
 }
@@ -39,11 +39,6 @@ User.init(
     password: {
       type: new DataTypes.STRING(128),
       allowNull: false,
-    },
-    previousPasswords: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      defaultValue: [],
     },
     emailVerified: {
       type: DataTypes.BOOLEAN,
