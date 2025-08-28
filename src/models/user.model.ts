@@ -41,7 +41,7 @@ User.init(
       allowNull: false,
     },
     previousPasswords: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.JSON,
       allowNull: true,
       defaultValue: [],
     },

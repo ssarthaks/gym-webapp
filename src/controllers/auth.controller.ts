@@ -3,6 +3,13 @@ import { User } from "../models/user.model";
 import { Session } from "../models/session.model";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generateToken";
+import {
+  validateRegistrationData,
+  validateLoginData,
+  validatePasswordChange,
+  validateProfileUpdate,
+  validateEmailOnly,
+} from "../utils/validation";
 
 export const register = async (
   req: Request,
@@ -12,7 +19,27 @@ export const register = async (
   try {
     const { name, email, phone, password } = req.body;
 
-    const existing = await User.findOne({ where: { email } });
+    // Validate request data
+    const validation = validateRegistrationData({
+      name,
+      email,
+      phone,
+      password,
+    });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const {
+      name: sanitizedName,
+      email: sanitizedEmail,
+      phone: sanitizedPhone,
+    } = validation.sanitizedData!;
+
+    const existing = await User.findOne({ where: { email: sanitizedEmail } });
     if (existing && !existing.isDeleted)
       return res.status(400).json({ message: "User already exists" });
     if (existing && existing.isDeleted)
@@ -23,9 +50,9 @@ export const register = async (
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name,
-      email,
-      phone,
+      name: sanitizedName,
+      email: sanitizedEmail,
+      phone: sanitizedPhone,
       password: hashedPassword,
       previousPasswords: [hashedPassword],
     });
@@ -45,7 +72,18 @@ export const login = async (
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    // Validate request data
+    const validation = validateLoginData({ email, password });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const { email: sanitizedEmail } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
     if (!user || user.isDeleted)
       return res
         .status(401)
@@ -73,7 +111,23 @@ export const changePassword = async (
 ) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
-    const user = await User.findOne({ where: { email } });
+
+    // Validate request data
+    const validation = validatePasswordChange({
+      email,
+      oldPassword,
+      newPassword,
+    });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const { email: sanitizedEmail } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
@@ -108,15 +162,44 @@ export const updateProfile = async (
   next: NextFunction
 ) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ where: { email } });
+    const { email, name, phone, newEmail } = req.body;
+
+    // Validate request data
+    const validation = validateProfileUpdate({ email, name, phone, newEmail });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const {
+      email: sanitizedEmail,
+      name: sanitizedName,
+      phone: sanitizedPhone,
+      newEmail: sanitizedNewEmail,
+    } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Only allow updating name, phone, and optionally email
-    const { name, phone, newEmail } = req.body;
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (newEmail) user.email = newEmail;
+    // Update fields if provided
+    if (sanitizedName !== undefined) {
+      user.name = sanitizedName;
+    }
+    if (sanitizedPhone !== undefined) {
+      user.phone = sanitizedPhone;
+    }
+    if (sanitizedNewEmail !== undefined) {
+      // Check if new email already exists
+      const existingUser = await User.findOne({
+        where: { email: sanitizedNewEmail },
+      });
+      if (existingUser && existingUser.id !== user.id) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+      user.email = sanitizedNewEmail;
+    }
 
     await user.save();
     res.json({
@@ -135,7 +218,19 @@ export const verifyEmail = async (
 ) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ where: { email } });
+
+    // Validate request data
+    const validation = validateEmailOnly({ email });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const { email: sanitizedEmail } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     user.emailVerified = true;
@@ -153,7 +248,19 @@ export const deleteAccount = async (
 ) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ where: { email } });
+
+    // Validate request data
+    const validation = validateEmailOnly({ email });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const { email: sanitizedEmail } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
     if (!user) return res.status(404).json({ message: "User not found" });
     if (user.isDeleted)
       return res.status(400).json({ message: "Account already deleted." });
