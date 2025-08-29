@@ -16,9 +16,68 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dumbbell, Mail, Lock, User, Building2 } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function AuthPage() {
-  const [userType, setUserType] = useState("individual");
+  const [accountType, setAccountType] = useState("individual");
+
+  const [agreeTerms, setAgreeTerms] = useState(false);
+
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [signupData, setSignupData] = useState({
+    name: "",
+    email: "",
+    accountType: "",
+    address: "",
+    phone: "",
+    password: "",
+  });
+
+  const handleCheckboxDataChange = (checked: boolean) => {
+    setAgreeTerms(checked);
+  };
+
+  const handleAccountTypeChange = (value: string) => {
+    setAccountType(value);
+    setSignupData((prev) => ({ ...prev, accountType: value }));
+  };
+
+  const handleSignupDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSignupData((prev) => ({ ...prev, [e.target.name]: value }));
+  };
+
+  const handleLoginDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setLoginData((prev) => ({ ...prev, [e.target.name]: value }));
+  };
+
+  const handleLogin = () => {
+    if (!loginData.email || !loginData.password) {
+      toast.error("Please fill in all fields");
+    }
+    console.log(loginData);
+  };
+
+  const handleSignup = () => {
+    if (
+      !signupData.name ||
+      !signupData.email ||
+      !signupData.phone ||
+      !signupData.address ||
+      !signupData.password
+    ) {
+      toast.error("Please fill in all fields");
+    }
+    else if (!agreeTerms) {
+      toast.error("Please agree to the terms and conditions");
+    }
+    console.log(signupData);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,8 +114,10 @@ export default function AuthPage() {
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="email"
+                          name="email"
                           type="email"
                           placeholder="your@email.com"
+                          onChange={handleLoginDataChange}
                           className="pl-10"
                         />
                       </div>
@@ -68,7 +129,9 @@ export default function AuthPage() {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="password"
+                          name="password"
                           type="password"
+                          onChange={handleLoginDataChange}
                           placeholder="••••••••"
                           className="pl-10"
                         />
@@ -87,9 +150,11 @@ export default function AuthPage() {
                       </Button>
                     </div>
 
-                    <Button className="w-full">Sign In</Button>
+                    <Button className="w-full" onClick={handleLogin}>
+                      Sign In
+                    </Button>
 
-                    <div className="relative">
+                    {/* <div className="relative">
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-muted" />
                       </div>
@@ -98,9 +163,9 @@ export default function AuthPage() {
                           Or continue with
                         </span>
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* <div className="grid grid-cols-2 gap-3">
                       <Button variant="outline">
                         <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
                           <path
@@ -132,7 +197,7 @@ export default function AuthPage() {
                         </svg>
                         Facebook
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </TabsContent>
 
@@ -141,8 +206,10 @@ export default function AuthPage() {
                   <div className="space-y-4">
                     {/* Account Type Selection */}
                     <div>
-                      <Label>Account Type</Label>
-                      <Select value={userType} onValueChange={setUserType}>
+                      <Select
+                        value={accountType}
+                        onValueChange={handleAccountTypeChange}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -163,24 +230,25 @@ export default function AuthPage() {
                       </Select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {accountType === "individual" ? (
                       <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" placeholder="John" />
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          onChange={handleSignupDataChange}
+                          placeholder="Your Name"
+                        />
                       </div>
-                      <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" placeholder="Doe" />
-                      </div>
-                    </div>
-
-                    {userType === "business" && (
+                    ) : (
                       <div>
                         <Label htmlFor="businessName">Business Name</Label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="businessName"
+                            name="name"
+                            onChange={handleSignupDataChange}
                             placeholder="Your business name"
                             className="pl-10"
                           />
@@ -189,12 +257,44 @@ export default function AuthPage() {
                     )}
 
                     <div>
+                      <Label htmlFor="phoneReg">Phone</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="phoneReg"
+                          name="phone"
+                          onChange={handleSignupDataChange}
+                          type="tel"
+                          placeholder="+977-98xxxxxx"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="addressReg">Address</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="addressReg"
+                          type="text"
+                          name="address"
+                          onChange={handleSignupDataChange}
+                          placeholder="Kathmandu, Bagmati"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
                       <Label htmlFor="emailReg">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="emailReg"
                           type="email"
+                          name="email"
+                          onChange={handleSignupDataChange}
                           placeholder="your@email.com"
                           className="pl-10"
                         />
@@ -202,25 +302,14 @@ export default function AuthPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="passwordReg">Password</Label>
+                      <Label htmlFor="password">Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          id="passwordReg"
+                          id="password"
+                          name="password"
                           type="password"
-                          placeholder="••••••••"
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="confirmPassword"
-                          type="password"
+                          onChange={handleSignupDataChange}
                           placeholder="••••••••"
                           className="pl-10"
                         />
@@ -228,7 +317,10 @@ export default function AuthPage() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms" />
+                      <Checkbox
+                        id="terms"
+                        onCheckedChange={handleCheckboxDataChange}
+                      />
                       <Label htmlFor="terms" className="text-sm">
                         I agree to the{" "}
                         <Button variant="link" className="p-0 h-auto text-sm">
@@ -241,7 +333,9 @@ export default function AuthPage() {
                       </Label>
                     </div>
 
-                    <Button className="w-full">Create Account</Button>
+                    <Button className="w-full" onClick={handleSignup}>
+                      Create Account
+                    </Button>
                   </div>
                 </TabsContent>
               </Tabs>
