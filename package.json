@@ -7,7 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "migrate:status": "sequelize-cli db:migrate:status",
+    "seed": "sequelize-cli db:seed:all",
+    "seed:undo": "sequelize-cli db:seed:undo:all",
+    "db:create": "sequelize-cli db:create",
+    "db:drop": "sequelize-cli db:drop"
   },
   "author": "Sarthak",
   "license": "ISC",

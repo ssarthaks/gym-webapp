@@ -7,6 +7,7 @@ export class User extends Model {
   public email!: string;
   public phone!: string;
   public address?: string;
+  public accountType!: "individual" | "business";
   public password!: string;
   public emailVerified!: boolean;
   public isDeleted!: boolean;
@@ -35,6 +36,10 @@ User.init(
     address: {
       type: new DataTypes.STRING(256),
       allowNull: true,
+    },
+    accountType: {
+      type: new DataTypes.ENUM("individual", "business"),
+      allowNull: false,
     },
     password: {
       type: new DataTypes.STRING(128),

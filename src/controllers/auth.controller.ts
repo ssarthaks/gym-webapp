@@ -23,7 +23,7 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, phone, password, address } = req.body;
+    const { name, email, phone, password, address, accountType } = req.body;
 
     // Validate request data
     const validation = validateRegistrationData({
@@ -32,6 +32,7 @@ export const register = async (
       phone,
       password,
       address,
+      accountType,
     });
     if (!validation.isValid) {
       return res.status(400).json({
@@ -46,6 +47,7 @@ export const register = async (
       phone: sanitizedPhone,
       password: sanitizedPassword,
       address: sanitizedAddress,
+      accountType: sanitizedAccountType,
     } = validation.sanitizedData!;
 
     const existing = await User.findOne({ where: { email: sanitizedEmail } });
@@ -62,6 +64,8 @@ export const register = async (
       name: sanitizedName,
       email: sanitizedEmail,
       phone: sanitizedPhone,
+      address: sanitizedAddress,
+      accountType: sanitizedAccountType,
       password: hashedPassword,
     });
 
@@ -74,6 +78,7 @@ export const register = async (
         email: user.email,
         phone: user.phone,
         address: user.address || null,
+        accountType: user.accountType,
         emailVerified: user.emailVerified,
       },
     });

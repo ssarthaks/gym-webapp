@@ -107,9 +107,10 @@ export const validateRegistrationData = (data: {
   phone?: string;
   password?: string;
   address?: string;
+  accountType?: "individual" | "business";
 }): ValidationResult => {
   const errors: ValidationError[] = [];
-  const { name, email, phone, password, address } = data;
+  const { name, email, phone, password, address, accountType } = data;
 
   // Check for required fields first
   if (name === undefined || name === null) {
@@ -140,6 +141,12 @@ export const validateRegistrationData = (data: {
     if (addressError) errors.push(addressError);
   }
 
+  if (accountType === undefined || accountType === null) {
+    errors.push({ field: "accountType", message: "Account type is required" });
+  } else if (!["individual", "business"].includes(accountType)) {
+    errors.push({ field: "accountType", message: "Invalid account type" });
+  }
+
   if (password === undefined || password === null) {
     errors.push({ field: "password", message: "Password is required" });
   } else {
@@ -167,6 +174,7 @@ export const validateRegistrationData = (data: {
   }
   if (phone) sanitizedData.phone = sanitizePhone(phone);
   if (address) sanitizedData.address = sanitizeAddress(address);
+  if (accountType) sanitizedData.accountType = accountType;
   if (password) sanitizedData.password = password;
 
   return { isValid: true, errors: [], sanitizedData };
