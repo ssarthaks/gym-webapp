@@ -6,3 +6,8 @@ export interface UserInterface {
   address: string;
   accountType: "individual" | "business";
 }
+
+export interface AuthState {
+  user: UserInterface | null;
+  isAuthenticated: boolean;
+}
