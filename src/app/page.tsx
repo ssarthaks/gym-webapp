@@ -1,8 +1,8 @@
 import { Navbar } from "@/components/layout/navbar";
-import { HeroSection } from "@/components/sections/hero";
-import { FeaturedEquipment } from "@/components/sections/featured-equipment";
-import { ForSellers } from "@/components/sections/for-sellers";
-import { FeaturedPrograms } from "@/components/sections/featured-programs";
+import { HeroSection } from "@/components/pages/homepage/hero";
+import { FeaturedEquipment } from "@/components/pages/homepage/featured-equipment";
+import { ForSellers } from "@/components/pages/homepage/for-sellers";
+import { FeaturedPrograms } from "@/components/pages/homepage/featured-programs";
 import { Footer } from "@/components/layout/footer";
 
 export default function HomePage() {
