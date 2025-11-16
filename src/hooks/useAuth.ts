@@ -4,8 +4,13 @@ import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "./reduxHooks";
 import { setUser } from "@/store/authSlice";
+import { UserInterface } from "@/interfaces/user";
+import { AppDispatch } from "@/store/store";
 
-const storeAuthData = (dispatch: any, data: { token: string; user: any }) => {
+const storeAuthData = (
+  dispatch: AppDispatch,
+  data: { token: string; user: UserInterface }
+) => {
   // Save token securely in cookies
   Cookies.set("token", data.token, {
     expires: 7,
