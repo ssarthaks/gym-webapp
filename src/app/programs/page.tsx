@@ -162,7 +162,7 @@ export default function ProgramsPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-primary text-primary-foreground py-16">
+      <section className="bg-primary text-primary-foreground pt-32 pb-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">Fitness Programs</h1>
           <p className="text-xl mb-8">

@@ -1,3 +1,5 @@
+"use client";
+
 import { Navbar } from "@/components/layout/navbar";
 import { HeroSection } from "@/components/pages/homepage/hero";
 import { FeaturedEquipment } from "@/components/pages/homepage/featured-equipment";

@@ -10,7 +10,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Dumbbell className="h-8 w-8" />
-              <span className="text-xl font-bold">GymPro</span>
+              <span className="text-xl font-bold">OneStopFitness</span>
             </div>
             <p className="text-primary-foreground/80 text-sm">
               The leading marketplace for professional gym equipment and fitness programs.
@@ -68,12 +68,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center">
           <p className="text-primary-foreground/80 text-sm">
-            © 2024 GymPro. All rights reserved.
-          </p>
-          <p className="text-primary-foreground/80 text-sm">
-            Built with ❤️ for the fitness community
+            © 2025 OneStopFitness. All rights reserved.
           </p>
         </div>
       </div>

@@ -114,7 +114,7 @@ const testimonials = [
     role: "Operations Director",
     company: "FitChain Gyms",
     content:
-      "GymPro has streamlined our equipment procurement across 15 locations. The enterprise dashboard saves us hours every week.",
+      "OneStopFitness has streamlined our equipment procurement across 15 locations. The enterprise dashboard saves us hours every week.",
     rating: 5,
     logo: "🏢",
   },
@@ -135,7 +135,7 @@ export default function CompaniesPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="pt-20 pb-16 bg-muted/30">
+      <div className="pt-24 pb-16 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <Badge className="mb-4 bg-primary/10 text-primary">
@@ -339,8 +339,8 @@ export default function CompaniesPage() {
             Ready to Transform Your Business?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join hundreds of companies that trust GymPro for their equipment
-            needs. Start your free trial today.
+            Join hundreds of companies that trust OneStopFitness for their
+            equipment needs. Start your free trial today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" className="text-lg px-8 py-3">
@@ -349,7 +349,7 @@ export default function CompaniesPage() {
             <Button
               variant="outline"
               size="lg"
-              className="text-lg px-8 py-3 text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              className="text-lg px-8 py-3 text-primary border-none"
             >
               Schedule Demo
             </Button>

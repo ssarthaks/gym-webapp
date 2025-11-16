@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ReactQueryProvider } from "./providers";
+import { ReactQueryProvider, ReduxProvider } from "./providers";
 import { ToastContainer, Bounce } from "react-toastify";
 
 const geistSans = Geist({
@@ -44,9 +44,11 @@ export default function RootLayout({
           theme="light"
           transition={Bounce}
         />
-        <ReactQueryProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </ReactQueryProvider>
+        <ReduxProvider>
+          <ReactQueryProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </ReactQueryProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

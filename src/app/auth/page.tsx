@@ -90,7 +90,7 @@ export default function AuthPage() {
               <Dumbbell className="h-8 w-8 text-accent" />
             </div>
             <h1 className="text-2xl font-bold text-primary">
-              Welcome to GymPro
+              Welcome to OneStopFitness
             </h1>
             <p className="text-muted-foreground">
               Join our fitness equipment community
