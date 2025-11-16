@@ -6,27 +6,33 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
 
-    "start:backend": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "dev:backend": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build:backend": "tsc",
-    "migrate": "sequelize-cli db:migrate",
-    "migrate:undo": "sequelize-cli db:migrate:undo",
-    "migrate:undo:all": "sequelize-cli db:migrate:undo:all",
-    "migrate:status": "sequelize-cli db:migrate:status",
-    "seed": "sequelize-cli db:seed:all",
-    "seed:undo": "sequelize-cli db:seed:undo:all",
-    "db:create": "sequelize-cli db:create",
-    "db:drop": "sequelize-cli db:drop",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "npm run build:backend && npm run build:frontend",
 
+    "start:backend": "node server/dist/index.js",
+    "dev:backend": "ts-node-dev --respawn --transpile-only server/src/index.ts",
+    "build:backend": "tsc -p server/tsconfig.json",
+    
     "dev:frontend": "next dev",
     "build:frontend": "next build",
     "start:frontend": "next start",
+    
+    "migrate": "cd server && sequelize-cli db:migrate",
+    "migrate:undo": "cd server && sequelize-cli db:migrate:undo",
+    "migrate:undo:all": "cd server && sequelize-cli db:migrate:undo:all",
+    "migrate:status": "cd server && sequelize-cli db:migrate:status",
+    "seed": "cd server && sequelize-cli db:seed:all",
+    "seed:undo": "cd server && sequelize-cli db:seed:undo:all",
+    "db:create": "cd server && sequelize-cli db:create",
+    "db:drop": "cd server && sequelize-cli db:drop",
+    
     "lint": "eslint"
   },
   "author": "Sarthak",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
@@ -79,6 +85,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
@@ -92,8 +99,10 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
-    "postcss": "^8.5.6"
+    "postcss": "^8.5.6",
+    "sequelize-cli": "^6.6.2"
   }
 }
