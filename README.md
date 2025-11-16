@@ -194,47 +194,6 @@ npm run dev:backend
 - Nodemailer
 - bcrypt
 
-## 🌐 API Integration
-
-The frontend proxies API requests to the backend. Use the `/api` prefix:
-
-```typescript
-// Frontend code
-const response = await fetch("/api/auth/login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-```
-
-This automatically routes to `http://localhost:5000/auth/login`
-
-## 📚 Key Configuration Files
-
-- `.env` - Environment variables
-- `.sequelizerc` - Sequelize CLI configuration
-- `next.config.ts` - Next.js configuration with API proxy
-- `tsconfig.json` - Frontend TypeScript config
-- `server/tsconfig.json` - Backend TypeScript config
-
-## 🐛 Troubleshooting
-
-**Port already in use:**
-
-- Change `PORT` in `.env` (backend)
-- Next.js port can be changed: `PORT=3001 npm run dev:frontend`
-
-**Database connection error:**
-
-- Ensure MySQL is running
-- Verify credentials in `.env`
-- Check database exists: `npm run db:create`
-
-**CORS errors:**
-
-- Verify `FRONTEND_URL` in `.env` matches your frontend URL
-- Check `NEXT_PUBLIC_API_URL` in `.env`
-
 ## 📄 License
 
 ISC
