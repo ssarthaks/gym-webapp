@@ -1,53 +1,27 @@
-# Gym WebApp - Fullstack Application
+# Fitness Webapp 💪
 
-A fullstack gym webapp with Next.js frontend and Express.js backend, sharing a single monorepo structure.
+A full-stack fitness marketplace and training platform connecting gym equipment sellers, fitness programs, and users in a unified ecosystem.
 
-## 📁 Project Structure
+## 🎯 Overview
 
-```
-gym-webapp/
-├── src/                    # Next.js frontend
-│   ├── app/               # App router pages
-│   ├── components/        # React components
-│   ├── hooks/            # Custom hooks
-│   └── store/            # Redux store
-├── server/                # Express.js backend
-│   ├── src/              # Backend source code
-│   ├── migrations/       # Database migrations
-│   ├── seeders/          # Database seeders
-│   └── config/           # Backend configuration
-├── public/               # Static assets
-└── package.json          # Shared dependencies
-```
+This is a comprehensive fitness web application built as a monorepo with:
+- **Backend**: Express.js + TypeScript + MySQL + Sequelize
+- **Frontend**: Next.js 16 (App Router) + Redux Toolkit + Tailwind CSS
 
-## 🚀 Getting Started
+**Current Status**: Backend authentication system fully implemented with database migrations. Frontend structure complete, API integration in progress.
 
-### Prerequisites
+## ⚡ Quick Start
 
-- Node.js 18+
-- MySQL 8.0+
-- npm or yarn
+```bash
+# Install dependencies
+npm install
 
-### Initial Setup
+# Setup database
+npm run db:create
+npm run migrate
 
-1. **Clone the repository**
-
-   ```bash
-   git clone <your-repo-url>
-   cd gym-webapp
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Setup environment variables**
-
-   Copy and edit the `.env.example` file:
-
-   ```bash
+# Run the app (backend + frontend)
+npm run dev
    cp .env.example .env
    ```
 
@@ -75,125 +49,67 @@ gym-webapp/
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASS=your_app_password
 
-   # Next.js Frontend
-   NEXT_PUBLIC_API_URL=http://localhost:5000
-   ```
-
-4. **Setup Database**
-
-   Create the database:
-
-   ```bash
-   npm run db:create
-   ```
-
-   Run migrations:
-
-   ```bash
-   npm run migrate
-   ```
-
-   (Optional) Seed demo data:
-
-   ```bash
-   npm run seed
-   ```
-
-### Development
-
-**Run both frontend and backend concurrently:**
-
-```bash
-npm run dev
 ```
 
-**Or run them separately:**
+**Visit:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
 
-Frontend (Next.js on port 3000):
+📚 **For detailed setup instructions, see [PROJECT_SETUP.md](PROJECT_SETUP.md)**
 
-```bash
-npm run dev:frontend
+## ✨ Key Features
+
+### Implemented ✅
+- Complete user authentication (register, login, JWT sessions)
+- Email verification system with 6-digit codes
+- Password reset functionality
+- User profile management
+- Protected routes with middleware
+- Rate limiting and security headers
+- Database migrations with Sequelize
+
+### In Development 🚧
+- Equipment marketplace
+- Training program management
+- Shopping cart and checkout
+- Order processing
+- Business account features
+- Dashboard analytics
+
+## 🛠️ Tech Stack
+
+**Frontend:** Next.js 16, TypeScript, Redux Toolkit, Tailwind CSS, Radix UI  
+**Backend:** Express.js, TypeScript, MySQL, Sequelize, JWT, bcrypt  
+**Tools:** ts-node-dev, sequelize-cli, concurrently
+
+## 📦 Project Structure
+
+```
+├── server/          # Express.js backend
+│   ├── src/         # Controllers, models, routes, middleware
+│   ├── migrations/  # Database migrations
+│   └── config/      # Database configuration
+├── src/             # Next.js frontend
+│   ├── app/         # App router pages
+│   ├── components/  # React components
+│   └── store/       # Redux state management
+└── public/          # Static assets
 ```
 
-Backend (Express on port 5000):
+## 📚 Documentation
 
-```bash
-npm run dev:backend
-```
+- **[PROJECT_SETUP.md](PROJECT_SETUP.md)** - Complete setup guide, API documentation, troubleshooting
+- **[.env.example](.env.example)** - Environment variables template
 
-### Production Build
+## 🤝 Contributing
 
-1. **Build both applications:**
+This project is currently in active development on the `feat/serviceBasedBackend` branch.
 
-   ```bash
-   npm run build
-   ```
-
-2. **Start production servers:**
-
-   Backend:
-
-   ```bash
-   npm run start:backend
-   ```
-
-   Frontend:
-
-   ```bash
-   npm run start:frontend
-   ```
-
-## 📝 Available Scripts
-
-### Development
-
-- `npm run dev` - Run both frontend and backend concurrently
-- `npm run dev:frontend` - Run Next.js dev server (port 3000)
-- `npm run dev:backend` - Run Express dev server (port 5000)
-
-### Build
-
-- `npm run build` - Build both frontend and backend
-- `npm run build:frontend` - Build Next.js app
-- `npm run build:backend` - Compile TypeScript backend
-
-### Database
-
-- `npm run migrate` - Run all pending migrations
-- `npm run migrate:undo` - Undo last migration
-- `npm run migrate:status` - Check migration status
-- `npm run seed` - Run all seeders
-- `npm run seed:undo` - Undo all seeders
-- `npm run db:create` - Create database
-- `npm run db:drop` - Drop database
-
-### Production
-
-- `npm run start:frontend` - Start Next.js production server
-- `npm run start:backend` - Start Express production server
-
-## 🔧 Tech Stack
-
-### Frontend
-
-- Next.js 15.5
-- React 19
-- TypeScript
-- Redux Toolkit
-- TailwindCSS
-- Radix UI
-- React Hook Form + Zod
-
-### Backend
-
-- Express.js
-- TypeScript
-- Sequelize ORM
-- MySQL
-- JWT Authentication
-- Nodemailer
-- bcrypt
-
-## 📄 License
+## 📝 License
 
 ISC
+
+---
+
+**Developer:** Sarthak  
+**Repository:** [github.com/ssarthaks/gym-webapp](https://github.com/ssarthaks/gym-webapp)
