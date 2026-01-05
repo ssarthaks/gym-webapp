@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,13 +16,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dumbbell, Mail, Lock, User, Building2 } from "lucide-react";
+import { Dumbbell, Mail, Lock, User, Building2, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import { setAuth } from "@/store/authSlice";
+import { loginUser, registerUser } from "@/api/auth";
 
 export default function AuthPage() {
-  const [accountType, setAccountType] = useState("individual");
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
+  const [accountType, setAccountType] = useState("individual");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [isRegisterLoading, setIsRegisterLoading] = useState(false);
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -31,7 +39,7 @@ export default function AuthPage() {
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
-    accountType: "",
+    accountType: "individual",
     address: "",
     phone: "",
     password: "",
@@ -56,14 +64,32 @@ export default function AuthPage() {
     setLoginData((prev) => ({ ...prev, [e.target.name]: value }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!loginData.email || !loginData.password) {
       toast.error("Please fill in all fields");
+      return;
     }
-    console.log(loginData);
+
+    setIsLoginLoading(true);
+    try {
+      const response = await loginUser(loginData.email, loginData.password);
+
+      // Store auth data in Redux and cookies
+      dispatch(setAuth({ user: response.user, token: response.token }));
+
+      toast.success("Login successful!");
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again.");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoginLoading(false);
+    }
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (
       !signupData.name ||
       !signupData.email ||
@@ -72,11 +98,36 @@ export default function AuthPage() {
       !signupData.password
     ) {
       toast.error("Please fill in all fields");
+      return;
     }
-    else if (!agreeTerms) {
+
+    if (!agreeTerms) {
       toast.error("Please agree to the terms and conditions");
+      return;
     }
-    console.log(signupData);
+
+    if (signupData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    setIsRegisterLoading(true);
+    try {
+      const response = await registerUser(signupData);
+
+      // Store auth data in Redux and cookies
+      dispatch(setAuth({ user: response.user, token: response.token }));
+
+      toast.success("Registration successful! Welcome to OneStopFitness!");
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed. Please try again.");
+      console.error("Registration error:", error);
+    } finally {
+      setIsRegisterLoading(false);
+    }
   };
 
   return (
@@ -150,8 +201,19 @@ export default function AuthPage() {
                       </Button>
                     </div>
 
-                    <Button className="w-full" onClick={handleLogin}>
-                      Sign In
+                    <Button
+                      className="w-full"
+                      onClick={handleLogin}
+                      disabled={isLoginLoading}
+                    >
+                      {isLoginLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Signing In...
+                        </>
+                      ) : (
+                        "Sign In"
+                      )}
                     </Button>
 
                     {/* <div className="relative">
@@ -333,8 +395,19 @@ export default function AuthPage() {
                       </Label>
                     </div>
 
-                    <Button className="w-full" onClick={handleSignup}>
-                      Create Account
+                    <Button
+                      className="w-full"
+                      onClick={handleSignup}
+                      disabled={isRegisterLoading}
+                    >
+                      {isRegisterLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating Account...
+                        </>
+                      ) : (
+                        "Create Account"
+                      )}
                     </Button>
                   </div>
                 </TabsContent>

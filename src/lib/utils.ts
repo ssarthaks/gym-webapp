@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 // load user from cookies on app start
 import Cookies from "js-cookie";
-import { setUser } from "@/store/authSlice";
+import { setAuth } from "@/store/authSlice";
 import { AppDispatch } from "@/store/store";
 
 export function cn(...inputs: ClassValue[]) {
@@ -12,12 +12,17 @@ export function cn(...inputs: ClassValue[]) {
 
 export const loadUserFromCookies = (dispatch: AppDispatch) => {
   const userCookie = Cookies.get("user");
-  if (userCookie) {
+  const tokenCookie = Cookies.get("token");
+
+  if (userCookie && tokenCookie) {
     try {
       const user = JSON.parse(userCookie);
-      dispatch(setUser(user));
+      dispatch(setAuth({ user, token: tokenCookie }));
     } catch (error) {
       console.error("Failed to parse user cookie", error);
+      // Clear invalid cookies
+      Cookies.remove("user");
+      Cookies.remove("token");
     }
   }
 };
