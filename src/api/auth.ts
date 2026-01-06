@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${process.env.BACKEND_URL}/auth/login`, {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
       email,
       password,
     });
@@ -22,7 +22,7 @@ export const registerUser = async (userData: {
   password: string;
 }) => {
   try {
-    const response = await axios.post(`${process.env.BACKEND_URL}/auth/register`, userData);
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, userData);
     return response.data;
   } catch (error) {
     console.error("Error registering user:", error);

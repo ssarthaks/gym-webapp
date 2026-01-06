@@ -182,9 +182,9 @@ Edit the `.env` file with your configuration:
 
 ```env
 # Backend API URL for Next.js
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:4200
 
-PORT=5000
+PORT=4200
 NODE_ENV=development
 
 # Frontend URL for CORS
@@ -678,10 +678,10 @@ Authorization: Bearer <token>
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `PORT` | Backend server port | `5000` |
+| `PORT` | Backend server port | `4200` |
 | `NODE_ENV` | Environment mode | `development` or `production` |
 | `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:3000` |
-| `NEXT_PUBLIC_API_URL` | Backend API URL for Next.js | `http://localhost:5000` |
+| `NEXT_PUBLIC_API_URL` | Backend API URL for Next.js | `http://localhost:4200` |
 | `DB_HOST` | MySQL host | `localhost` |
 | `DB_USER` | MySQL username | `root` |
 | `DB_PASSWORD` | MySQL password | `your_password` |
@@ -756,8 +756,8 @@ Authorization: Bearer <token>
 
 2. Or change ports in `.env`:
    ```env
-   PORT=5001
-   NEXT_PUBLIC_API_URL=http://localhost:5001
+   PORT=4201
+   NEXT_PUBLIC_API_URL=http://localhost:4201
    ```
 
 ### Email Sending Issues

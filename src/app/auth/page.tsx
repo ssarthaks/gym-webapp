@@ -113,6 +113,9 @@ export default function AuthPage() {
 
     setIsRegisterLoading(true);
     try {
+
+      console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
+      
       const response = await registerUser(signupData);
 
       // Store auth data in Redux and cookies
