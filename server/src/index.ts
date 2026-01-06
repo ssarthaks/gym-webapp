@@ -4,7 +4,7 @@ import "./models/user.model";
 import "./models/session.model";
 import "./models/verificationCode.model";
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4200;
 
 const startServer = async () => {
   try {
