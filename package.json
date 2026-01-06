@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build": "npm run build:backend && npm run build:frontend",
     "start:backend": "node server/dist/index.js",
-    "dev:backend": "ts-node-dev --respawn --transpile-only server/src/index.ts",
+    "dev:backend": "ts-node-dev --respawn --transpile-only --project server/tsconfig.json server/src/index.ts",
     "build:backend": "tsc -p server/tsconfig.json",
     "dev:frontend": "next dev",
     "build:frontend": "next build",
