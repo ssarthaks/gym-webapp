@@ -22,7 +22,14 @@ const router = express.Router();
 // Register endpoint
 router.post(
   "/register",
-  validateRequiredFields(["name", "email", "phone", "password", "address"]),
+  validateRequiredFields([
+    "name",
+    "email",
+    "phone",
+    "password",
+    "address",
+    "accountType",
+  ]),
   register
 );
 

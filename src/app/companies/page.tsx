@@ -114,7 +114,7 @@ const testimonials = [
     role: "Operations Director",
     company: "FitChain Gyms",
     content:
-      "OneStopFitness has streamlined our equipment procurement across 15 locations. The enterprise dashboard saves us hours every week.",
+      "OneFitness has streamlined our equipment procurement across 15 locations. The enterprise dashboard saves us hours every week.",
     rating: 5,
     logo: "🏢",
   },
@@ -339,8 +339,8 @@ export default function CompaniesPage() {
             Ready to Transform Your Business?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join hundreds of companies that trust OneStopFitness for their
-            equipment needs. Start your free trial today.
+            Join hundreds of companies that trust OneFitness for their equipment
+            needs. Start your free trial today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" className="text-lg px-8 py-3">

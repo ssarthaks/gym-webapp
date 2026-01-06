@@ -106,22 +106,14 @@ export default function AuthPage() {
       return;
     }
 
-    if (signupData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
-      return;
-    }
-
     setIsRegisterLoading(true);
     try {
-
-      console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
-      
       const response = await registerUser(signupData);
 
       // Store auth data in Redux and cookies
       dispatch(setAuth({ user: response.user, token: response.token }));
 
-      toast.success("Registration successful! Welcome to OneStopFitness!");
+      toast.success("Registration successful! Welcome to OneFitness!");
 
       // Redirect to dashboard
       router.push("/dashboard");
@@ -144,7 +136,7 @@ export default function AuthPage() {
               <Dumbbell className="h-8 w-8 text-accent" />
             </div>
             <h1 className="text-2xl font-bold text-primary">
-              Welcome to OneStopFitness
+              Welcome to OneFitness
             </h1>
             <p className="text-muted-foreground">
               Join our fitness equipment community
@@ -379,6 +371,10 @@ export default function AuthPage() {
                           className="pl-10"
                         />
                       </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Must be at least 8 characters with uppercase, lowercase,
+                        number, and symbol
+                      </p>
                     </div>
 
                     <div className="flex items-center space-x-2">

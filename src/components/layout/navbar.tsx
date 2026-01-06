@@ -20,10 +20,11 @@ import { clearAuth } from "@/store/authSlice";
 import { toast } from "react-toastify";
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(clearAuth());
@@ -48,12 +49,12 @@ export function Navbar() {
           <div className="flex items-center space-x-2">
             <Dumbbell className="h-8 w-8 text-primary" />
             <Link href="/" className="text-xl font-bold text-primary">
-              OneStopFitness
+              OneFitness
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden desktop:flex items-center space-x-8">
             <Link
               href="/equipment"
               className="text-foreground hover:text-accent transition-colors"
@@ -87,7 +88,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden desktop:flex items-center space-x-4">
             <Link href="/cart">
               <Button variant="ghost" size="icon">
                 <ShoppingCart className="h-4 w-4" />
@@ -152,7 +153,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="desktop:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -168,7 +169,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile Navigation */}
-        <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
+        <div className={cn(isOpen ? "block desktop:hidden" : "hidden")}>
           <div className="px-2 pt-2 pb-3 space-y-1 bg-surface border-t border-border">
             <Link
               href="/equipment"
