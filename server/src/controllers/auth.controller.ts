@@ -15,12 +15,14 @@ import {
 import {
   createAndSendVerificationCode,
   verifyCode,
+  createAndSendAccountVerification,
+  verifyAccountToken,
 } from "../utils/verificationHelper";
 
 export const register = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { name, email, phone, password, address, accountType } = req.body;
@@ -69,9 +71,25 @@ export const register = async (
       password: hashedPassword,
     });
 
+    // Send verification email
+    const verificationResult = await createAndSendAccountVerification(
+      sanitizedEmail,
+      sanitizedName,
+    );
+
+    if (!verificationResult.success) {
+      console.error(
+        "Failed to send verification email:",
+        verificationResult.message,
+      );
+      // Continue with registration even if email fails
+    }
+
     const token = generateToken(user.id);
     res.status(201).json({
       token,
+      message:
+        "Account created successfully. Please check your email to verify your account.",
       user: {
         id: user.id,
         name: user.name,
@@ -90,7 +108,7 @@ export const register = async (
 export const login = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email, password } = req.body;
@@ -143,7 +161,7 @@ export const login = async (
 export const changePassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { oldPassword, newPassword } = req.body;
@@ -192,7 +210,7 @@ export const changePassword = async (
 export const updateProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { name, phone, newEmail, address } = req.body;
@@ -268,7 +286,7 @@ export const updateProfile = async (
 export const sendEmailVerification = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = (req as any).user?.id;
@@ -290,7 +308,7 @@ export const sendEmailVerification = async (
     const result = await createAndSendVerificationCode(
       user.email,
       user.name,
-      "email_verification"
+      "email_verification",
     );
 
     if (!result.success) {
@@ -306,7 +324,7 @@ export const sendEmailVerification = async (
 export const verifyEmailCode = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email, code } = req.body;
@@ -352,7 +370,7 @@ export const verifyEmailCode = async (
 export const sendPasswordResetCode = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email } = req.body;
@@ -387,7 +405,7 @@ export const sendPasswordResetCode = async (
     const result = await createAndSendVerificationCode(
       sanitizedEmail,
       user.name,
-      "password_reset"
+      "password_reset",
     );
 
     if (!result.success) {
@@ -404,7 +422,7 @@ export const sendPasswordResetCode = async (
 export const resetPasswordWithCode = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email, code, newPassword } = req.body;
@@ -447,7 +465,7 @@ export const resetPasswordWithCode = async (
 
     // Filter out old password error since we don't need it for reset
     const passwordErrors = passwordValidation.errors.filter(
-      (err) => err.field === "newPassword"
+      (err) => err.field === "newPassword",
     );
     if (passwordErrors.length > 0) {
       return res.status(400).json({
@@ -483,7 +501,7 @@ export const resetPasswordWithCode = async (
 export const deleteAccount = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = (req as any).user?.id;
@@ -510,7 +528,7 @@ export const deleteAccount = async (
 export const getProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     // This endpoint assumes you have auth middleware that adds user to req
@@ -535,6 +553,33 @@ export const getProfile = async (
         emailVerified: user.emailVerified,
       },
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Verify account with token from email link
+export const verifyAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res
+        .status(400)
+        .json({ message: "Verification token is required" });
+    }
+
+    const result = await verifyAccountToken(token);
+
+    if (!result.success) {
+      return res.status(400).json({ message: result.message });
+    }
+
+    res.json({ message: result.message });
   } catch (err) {
     next(err);
   }

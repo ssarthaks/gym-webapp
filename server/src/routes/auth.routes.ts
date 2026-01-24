@@ -10,6 +10,7 @@ import {
   resetPasswordWithCode,
   deleteAccount,
   getProfile,
+  verifyAccount,
 } from "../controllers/auth.controller";
 import {
   validateRequiredFields,
@@ -30,7 +31,7 @@ router.post(
     "address",
     "accountType",
   ]),
-  register
+  register,
 );
 
 // login endpoint
@@ -41,7 +42,7 @@ router.post(
   "/change-password",
   protect,
   validateRequiredFields(["oldPassword", "newPassword"]),
-  changePassword
+  changePassword,
 );
 
 // update profile endpoint
@@ -49,7 +50,14 @@ router.put(
   "/update-profile",
   protect,
   validateProfileMiddleware,
-  updateProfile
+  updateProfile,
+);
+
+// Account verification endpoint for email link verification
+router.post(
+  "/verify-account",
+  validateRequiredFields(["token"]),
+  verifyAccount,
 );
 
 // Email verification endpoints - one sends email code other verifies and makes changes in db
@@ -57,19 +65,19 @@ router.post("/send-email-verification", protect, sendEmailVerification);
 router.post(
   "/verify-email",
   validateRequiredFields(["email", "code"]),
-  verifyEmailCode
+  verifyEmailCode,
 );
 
 // Password reset endpoints- one sends email code other verifies and makes changes in db
 router.post(
   "/send-password-reset",
   validateRequiredFields(["email"]),
-  sendPasswordResetCode
+  sendPasswordResetCode,
 );
 router.post(
   "/reset-password",
   validateRequiredFields(["email", "code", "newPassword"]),
-  resetPasswordWithCode
+  resetPasswordWithCode,
 );
 
 // delete account endpoint

@@ -17,7 +17,7 @@ export const loginUser = async (email: string, password: string) => {
       {
         email,
         password,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -51,7 +51,7 @@ export const registerUser = async (userData: {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
-      userData
+      userData,
     );
     return response.data;
   } catch (error) {
@@ -71,5 +71,26 @@ export const registerUser = async (userData: {
       }
     }
     throw new Error("Registration failed. Please try again.");
+  }
+};
+
+export const verifyAccount = async (token: string) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify-account`,
+      { token },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      const errorData = axiosError.response?.data;
+
+      if (errorData?.message) {
+        throw new Error(errorData.message);
+      }
+    }
+    throw new Error("Account verification failed. Please try again.");
   }
 };
