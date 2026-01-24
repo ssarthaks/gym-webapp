@@ -4,8 +4,6 @@ import {
   login,
   changePassword,
   updateProfile,
-  sendEmailVerification,
-  verifyEmailCode,
   sendPasswordResetCode,
   resetPasswordWithCode,
   deleteAccount,
@@ -58,14 +56,6 @@ router.post(
   "/verify-account",
   validateRequiredFields(["token"]),
   verifyAccount,
-);
-
-// Email verification endpoints - one sends email code other verifies and makes changes in db
-router.post("/send-email-verification", protect, sendEmailVerification);
-router.post(
-  "/verify-email",
-  validateRequiredFields(["email", "code"]),
-  verifyEmailCode,
 );
 
 // Password reset endpoints- one sends email code other verifies and makes changes in db

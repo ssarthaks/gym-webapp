@@ -98,6 +98,16 @@ npm run dev
 
 ## 📚 Documentation
 
+Comprehensive documentation is available in the [docs/](docs/) folder:
+
+- **[Tech Stack & Libraries](docs/01-tech-stack.md)** - Complete list of technologies, libraries, and their purposes
+- **[Feature Listing](docs/02-feature-listing.md)** - All features (completed, in-progress, and planned)
+- **[Feature Implementation Guide](docs/03-feature-implementation.md)** - How each feature works (for technical and non-technical readers)
+
+Start with the [Documentation Index](docs/README.md) for guided navigation.
+
+## 📚 Additional Documentation
+
 - **[PROJECT_SETUP.md](PROJECT_SETUP.md)** - Complete setup guide, API documentation, troubleshooting
 - **[.env.example](.env.example)** - Environment variables template
 
