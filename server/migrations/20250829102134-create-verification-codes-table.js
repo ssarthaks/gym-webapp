@@ -15,7 +15,7 @@ module.exports = {
         allowNull: false,
       },
       code: {
-        type: Sequelize.STRING(6),
+        type: Sequelize.STRING(100), // Stores verification tokens (not 6-digit codes)
         allowNull: false,
       },
       type: {
@@ -40,7 +40,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal(
-          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
         ),
       },
     });

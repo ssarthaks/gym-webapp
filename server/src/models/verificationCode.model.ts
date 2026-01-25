@@ -4,7 +4,7 @@ import { sequelize } from "../config/database";
 export class VerificationCode extends Model {
   public id!: number;
   public email!: string;
-  public code!: string;
+  public code!: string; // Actually stores verification token, not a 6-digit code
   public type!: "email_verification" | "password_reset";
   public expiresAt!: Date;
   public isUsed!: boolean;
@@ -24,7 +24,7 @@ VerificationCode.init(
       allowNull: false,
     },
     code: {
-      type: new DataTypes.STRING(6),
+      type: new DataTypes.STRING(100), // Increased from 6 to support longer tokens
       allowNull: false,
     },
     type: {
@@ -52,5 +52,5 @@ VerificationCode.init(
         fields: ["expiresAt"],
       },
     ],
-  }
+  },
 );

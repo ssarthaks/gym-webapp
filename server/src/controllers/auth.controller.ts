@@ -13,10 +13,11 @@ import {
   validateProfileUpdateAuth,
 } from "../utils/validationHelper";
 import {
-  createAndSendVerificationCode,
-  verifyCode,
   createAndSendAccountVerification,
   verifyAccountToken,
+  createAndSendPasswordReset,
+  verifyPasswordResetToken,
+  markPasswordResetTokenUsed,
 } from "../utils/verificationHelper";
 
 export const register = async (
@@ -283,138 +284,6 @@ export const updateProfile = async (
   }
 };
 
-// Send password reset code
-export const sendPasswordResetCode = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { email } = req.body;
-
-    // Validate request data
-    const validation = validateEmailOnly({ email });
-    if (!validation.isValid) {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: validation.errors,
-      });
-    }
-
-    const { email: sanitizedEmail } = validation.sanitizedData!;
-
-    const user = await User.findOne({ where: { email: sanitizedEmail } });
-    if (!user) {
-      // Don't reveal if user exists or not for security
-      return res.json({
-        message:
-          "If an account with this email exists, a password reset code has been sent.",
-      });
-    }
-
-    if (user.isDeleted) {
-      return res
-        .status(400)
-        .json({ message: "Account is deleted. Please contact support." });
-    }
-
-    // Send password reset code
-    const result = await createAndSendVerificationCode(
-      sanitizedEmail,
-      user.name,
-      "password_reset",
-    );
-
-    if (!result.success) {
-      return res.status(500).json({ message: result.message });
-    }
-
-    res.json({ message: "Password reset code sent to your email." });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Reset password with code
-export const resetPasswordWithCode = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { email, code, newPassword } = req.body;
-
-    // Validate that all fields are provided
-    const missingFields = [];
-    if (!email) missingFields.push("email");
-    if (!code) missingFields.push("code");
-    if (!newPassword) missingFields.push("newPassword");
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: "Missing required fields",
-        errors: missingFields.map((field) => ({
-          field,
-          message: `${
-            field === "newPassword"
-              ? "New password"
-              : field.charAt(0).toUpperCase() + field.slice(1)
-          } is required`,
-        })),
-      });
-    }
-
-    // Validate email and password
-    const emailValidation = validateEmailOnly({ email });
-    if (!emailValidation.isValid) {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: emailValidation.errors,
-      });
-    }
-
-    // Validate new password strength
-    const passwordValidation = validatePasswordChange({
-      email,
-      oldPassword: "dummy", // We don't need old password for reset
-      newPassword,
-    });
-
-    // Filter out old password error since we don't need it for reset
-    const passwordErrors = passwordValidation.errors.filter(
-      (err) => err.field === "newPassword",
-    );
-    if (passwordErrors.length > 0) {
-      return res.status(400).json({
-        message: "Password validation failed",
-        errors: passwordErrors,
-      });
-    }
-
-    const { email: sanitizedEmail } = emailValidation.sanitizedData!;
-
-    // Verify the code first
-    const codeResult = await verifyCode(sanitizedEmail, code, "password_reset");
-    if (!codeResult.success) {
-      return res.status(400).json({ message: codeResult.message });
-    }
-
-    // Find user and update password
-    const user = await User.findOne({ where: { email: sanitizedEmail } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedNewPassword;
-    await user.save();
-
-    res.json({ message: "Password reset successfully." });
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const deleteAccount = async (
   req: Request,
   res: Response,
@@ -497,6 +366,152 @@ export const verifyAccount = async (
     }
 
     res.json({ message: result.message });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Send password reset email
+export const sendPasswordReset = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { email } = req.body;
+
+    // Validate request data
+    const validation = validateEmailOnly({ email });
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: validation.errors,
+      });
+    }
+
+    const { email: sanitizedEmail } = validation.sanitizedData!;
+
+    const user = await User.findOne({ where: { email: sanitizedEmail } });
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.json({
+        message:
+          "If an account with this email exists, a password reset link has been sent.",
+      });
+    }
+
+    if (user.isDeleted) {
+      return res
+        .status(400)
+        .json({ message: "Account is deleted. Please contact support." });
+    }
+
+    // Send password reset email
+    const result = await createAndSendPasswordReset(sanitizedEmail, user.name);
+
+    if (!result.success) {
+      return res.status(500).json({ message: result.message });
+    }
+
+    res.json({
+      message:
+        "If an account with this email exists, a password reset link has been sent.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Verify password reset token and return email
+export const verifyPasswordResetTokenController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+
+    const result = await verifyPasswordResetToken(token);
+
+    if (!result.success) {
+      return res.status(400).json({ message: result.message });
+    }
+
+    res.json({
+      message: result.message,
+      email: result.email,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Reset password with token
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Validate that all fields are provided
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        errors: [
+          ...((!token && [{ field: "token", message: "Token is required" }]) ||
+            []),
+          ...((!newPassword && [
+            { field: "newPassword", message: "New password is required" },
+          ]) ||
+            []),
+        ],
+      });
+    }
+
+    // Verify the token first
+    const tokenResult = await verifyPasswordResetToken(token);
+    if (!tokenResult.success || !tokenResult.email) {
+      return res.status(400).json({ message: tokenResult.message });
+    }
+
+    // Validate new password strength
+    const passwordValidation = validatePasswordChange({
+      email: tokenResult.email,
+      oldPassword: "dummy", // We don't need old password for reset
+      newPassword,
+    });
+
+    // Filter out old password error since we don't need it for reset
+    const passwordErrors = passwordValidation.errors.filter(
+      (err) => err.field === "newPassword",
+    );
+    if (passwordErrors.length > 0) {
+      return res.status(400).json({
+        message: "Password validation failed",
+        errors: passwordErrors,
+      });
+    }
+
+    // Find user and update password
+    const user = await User.findOne({ where: { email: tokenResult.email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    // Mark token as used
+    await markPasswordResetTokenUsed(token);
+
+    res.json({ message: "Password reset successfully." });
   } catch (err) {
     next(err);
   }

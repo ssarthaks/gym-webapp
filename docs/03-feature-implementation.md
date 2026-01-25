@@ -234,83 +234,110 @@ verification_codes table:
 ## 4. Password Reset
 
 ### 🌟 What It Does (Non-Technical)
-If someone forgets their password, they can request a password reset. The system sends them an email with a 6-digit code. They enter this code on the website along with their new password, and their password is updated.
+If someone forgets their password, they can request a password reset. The system sends them an email with a secure link. They click the link, which takes them to a page where they can enter their new password. Once they submit, their password is updated and they're redirected to login.
 
 ### 🎯 User Experience
 1. User clicks "Forgot Password?" on login page
 2. Enters their email address
-3. Receives email with 6-digit code (e.g., 582947)
-4. Returns to website, enters code and new password
-5. Password is reset successfully
-6. Can now login with new password
+3. Receives email with password reset link
+4. Clicks the link in email
+5. Taken to reset password page showing their email
+6. Enters new password and confirms it
+7. Submits the form
+8. Password is reset successfully
+9. Automatically redirected to login page
 
 ### 🔧 Technical Implementation
 
-**Two-Step Process:**
+**Link-Based Token System:**
 
-**Step 1: Request Reset Code**
+**Step 1: Request Reset Link**
 ```
 User enters email
   → Frontend sends POST to /api/auth/send-password-reset
   → Backend finds user with that email
-  → Generates random 6-digit code
-  → Stores code in database (expires in 10 minutes)
-  → Sends email with code
-  → Returns success message (doesn't reveal if user exists)
+  → Generates random secure token (long alphanumeric string)
+  → Stores token in database (expires in 1 hour)
+  → Sends email with link containing token
+  → Returns generic success message (doesn't reveal if user exists)
 ```
 
-**Step 2: Reset Password with Code**
+**Step 2: Verify Token and Show Form**
 ```
-User enters code + new password
-  → Frontend sends POST to /api/auth/reset-password
-  → Backend validates code
-  → Checks if code is correct and not expired
+User clicks link with token in URL
+  → Frontend extracts token from URL params
+  → Sends POST to /api/auth/verify-password-reset-token
+  → Backend verifies token is valid and not expired
+  → Returns user's email address
+  → Frontend displays reset form with email and password inputs
+```
+
+**Step 3: Reset Password**
+```
+User enters new password + confirmation
+  → Frontend validates passwords match and meet requirements
+  → Sends POST to /api/auth/reset-password with token + newPassword
+  → Backend verifies token again
   → Validates new password strength
-  → If valid:
-    → Hashes new password
-    → Updates user's password
-    → Marks code as used
-    → Returns success
+  → Hashes new password
+  → Updates user's password
+  → Marks token as used
+  → Returns success
+  → Frontend redirects to login page
 ```
 
-**Code Generation:**
+**Token Generation:**
 ```javascript
-Math.floor(100000 + Math.random() * 900000)
-// Generates: 100000 to 999999 (6 digits)
+Math.random().toString(36).substring(2, 15) +
+Math.random().toString(36).substring(2, 15) +
+Date.now().toString(36)
+// Generates: Long random alphanumeric string
 ```
 
 **Email Template:**
 - Red-themed (indicates security action)
-- Large 6-digit code displayed prominently
-- 10-minute expiration warning
+- Prominent "Reset My Password" button
+- Clickable link in case button doesn't work
+- 1-hour expiration warning
 - Security notice about unsolicited requests
 
 **Code Files:**
-- Send Code: `server/src/controllers/auth.controller.ts` (sendPasswordResetCode)
-- Reset Password: `server/src/controllers/auth.controller.ts` (resetPasswordWithCode)
-- Code Verification: `server/src/utils/verificationHelper.ts` (verifyCode)
-- Email: `server/src/utils/emailSendHelper.ts` (sendPasswordResetCode)
+- Send Link: [server/src/controllers/auth.controller.ts](server/src/controllers/auth.controller.ts) (sendPasswordReset)
+- Verify Token: [server/src/controllers/auth.controller.ts](server/src/controllers/auth.controller.ts) (verifyPasswordResetTokenController)
+- Reset Password: [server/src/controllers/auth.controller.ts](server/src/controllers/auth.controller.ts) (resetPassword)
+- Helper Functions: [server/src/utils/verificationHelper.ts](server/src/utils/verificationHelper.ts)
+- Email: [server/src/utils/emailSendHelper.ts](server/src/utils/emailSendHelper.ts) (sendPasswordResetEmail)
+- Frontend Page: [src/app/reset-password/page.tsx](src/app/reset-password/page.tsx)
 
 **Validation Rules:**
-- Code must be exactly 6 digits
-- Code must not be expired (< 10 minutes old)
-- Code must not be already used
-- New password must meet strength requirements
+- Token must be valid and not expired (< 1 hour old)
+- Token must not be already used
+- New password must meet strength requirements (min 8 characters)
+- Confirm password must match new password
 - Email must exist in database
 
 **Security Measures:**
-- Code expires in 10 minutes (short window)
-- Code can only be used once
+- Token expires in 1 hour (short window)
+- Token can only be used once
 - Generic success message doesn't reveal if email exists
-- New password is hashed before storage
-- Old codes are deleted when new one requested
-- Rate limiting prevents brute force attempts
+- New password is hashed before storage (bcrypt)
+- Old tokens are deleted when new one requested
+- Token is long and unguessable (not sequential or predictable)
+- HTTPS recommended for production (encrypted transmission)
 
-**Expiration Cleanup:**
-```javascript
-// Automatic cleanup of expired codes
-WHERE expiresAt < NOW() AND isUsed = false
-```
+**Frontend Features:**
+- Displays user's email (read-only) for confirmation
+- Real-time password validation
+- Password confirmation matching
+- Loading states during submission
+- Success/error message display
+- Automatic redirect to login after success
+- Handles expired/invalid tokens gracefully
+
+**API Endpoints:**
+- `POST /api/auth/send-password-reset` - Request reset link
+- `POST /api/auth/verify-password-reset-token` - Verify token and get email
+- `POST /api/auth/reset-password` - Update password with token
 
 ---
 

@@ -4,11 +4,12 @@ import {
   login,
   changePassword,
   updateProfile,
-  sendPasswordResetCode,
-  resetPasswordWithCode,
   deleteAccount,
   getProfile,
   verifyAccount,
+  sendPasswordReset,
+  resetPassword,
+  verifyPasswordResetTokenController,
 } from "../controllers/auth.controller";
 import {
   validateRequiredFields,
@@ -58,16 +59,21 @@ router.post(
   verifyAccount,
 );
 
-// Password reset endpoints- one sends email code other verifies and makes changes in db
+// Password reset endpoints
 router.post(
   "/send-password-reset",
   validateRequiredFields(["email"]),
-  sendPasswordResetCode,
+  sendPasswordReset,
+);
+router.post(
+  "/verify-password-reset-token",
+  validateRequiredFields(["token"]),
+  verifyPasswordResetTokenController,
 );
 router.post(
   "/reset-password",
-  validateRequiredFields(["email", "code", "newPassword"]),
-  resetPasswordWithCode,
+  validateRequiredFields(["token", "newPassword"]),
+  resetPassword,
 );
 
 // delete account endpoint
