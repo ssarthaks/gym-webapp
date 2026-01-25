@@ -1,5 +1,5 @@
-import Profile from "@/components/pages/Profile";
+import DashboardProfile from "@/components/dashboard/pages/DashboardProfile";
 
 export default function DashboardProfilePage() {
-  return <Profile showLayout={false} />;
+  return <DashboardProfile showLayout={false} />;
 }
